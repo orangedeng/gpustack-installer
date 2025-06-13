@@ -11,6 +11,7 @@ function ci() {
   make install "$@"
   make lint "$@"
   make build "$@"
+  make package "$@"
 }
 
 #

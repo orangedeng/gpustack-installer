@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - "v*-dev"
+    paths-ignore:
+      - "mkdocs.yml"
+      - "docs/**"
+      - "**.md"
+      - "**.mdx"
+      - "**.png"
+      - "**.jpg"
+      - "**.gif"
+  push:
+    branches:
+      - main
+      - "v*-dev"
+    paths-ignore:
+      - "mkdocs.yml"
+      - "docs/**"
+      - "**.md"
+      - "**.mdx"
+      - "**.png"
+      - "**.jpg"
+      - "**.gif"
+jobs:
+  ci-macos:
+    uses: ./.github/workflows/ci-common.yaml
+    with:
+      python-version: '3.10'
