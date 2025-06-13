@@ -72,12 +72,30 @@ function gpustack::version::get_version_vars() {
 
     # specify to v0.0.0 if the tree is dirty.
     if [[ "${GIT_TREE_STATE:-dirty}" == "dirty" ]]; then
-      GIT_VERSION="v0.0.0"
-    elif ! [[ "${GIT_VERSION}" =~ ^v([0-9]+)\.([0-9]+)(\.[0-9]+)?(-?[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
-      GIT_VERSION="v0.0.0"
+      GIT_VERSION="v0.0.0.0"
+    elif ! [[ "${GIT_VERSION}" =~ ^v([0-9]+)\.([0-9]+)(\.[0-9]+)?(\.[0-9]+)? ]]; then
+      GIT_VERSION="v0.0.0.0"
     fi
 
     # respect specified version
     GIT_VERSION=${VERSION:-${GIT_VERSION}}
+  fi
+
+  if [[ "${GIT_VERSION}" == "v0.0.0.0" ]]; then
+    LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || true)
+    if [[ -z "${LAST_TAG}" ]]; then
+      LAST_TAG="v0.0.0.0"
+    fi
+    # 保留前两位，第三位+1，第四位用GITHUB_RUN_NUMBER
+    if [[ "${LAST_TAG}" =~ ^v([0-9]+)\.([0-9]+)\.(\d+)(\.(\d+))?$ ]]; then
+      major="${BASH_REMATCH[1]}"
+      minor="${BASH_REMATCH[2]}"
+      patch="${BASH_REMATCH[3]}"
+      patch=$((patch + 1))
+      build="${GITHUB_RUN_NUMBER:-999}"
+      GIT_VERSION="v${major}.${minor}.${patch}.${build}"
+    else
+      GIT_VERSION="v0.0.1.${GITHUB_RUN_NUMBER:-999}"
+    fi
   fi
 }

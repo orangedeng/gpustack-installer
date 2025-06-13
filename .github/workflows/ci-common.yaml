@@ -1,0 +1,47 @@
+name: Common CI Steps
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: '3.10'
+      upload-artifacts:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  ci-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.8.3
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/pypoetry/artifacts
+            ~/Library/Caches/pypoetry/repository
+            ~/Library/Caches/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ inputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-${{ inputs.python-version }}-
+      - name: Run CI build
+        run: |
+          make ci
+      - name: upload-artifacts
+        if: ${{ inputs.upload-artifacts }}
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            dist/gpustack-${{ github.ref_name }}.pkg
+          name: build-${{runner.os}}
