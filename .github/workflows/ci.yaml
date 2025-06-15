@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - "v*-dev"
+      - test-copy-to-cos
     paths-ignore:
       - "mkdocs.yml"
       - "docs/**"

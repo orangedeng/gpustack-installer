@@ -36,12 +36,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-${{ inputs.python-version }}-
       - name: Run CI build
+        id: run_ci
         run: |
           make ci
+          make export_version
       - name: upload-artifacts
         if: ${{ inputs.upload-artifacts }}
         uses: actions/upload-artifact@v4
         with:
           path: |
-            dist/gpustack-${{ github.ref_name }}.pkg
+            dist/gpustack-${{steps.run_ci.outputs.GIT_VERSION }}.pkg
           name: build-${{runner.os}}

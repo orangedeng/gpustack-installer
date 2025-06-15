@@ -67,6 +67,7 @@ runs:
         #!/usr/bin/env bash
           
         set -e
+        trap 'echo "[ERROR] Script failed at line $LINENO"' ERR
 
         shopt -s expand_aliases
         alias gh="gh --repo ${GITHUB_REPOSITORY}"
@@ -131,5 +132,18 @@ runs:
               continue
             fi
             release "${RELEASE_TAG}"
+          done
+        fi
+
+        # 错误处理：如果 coscli_output 目录下存在子目录，则打印所有子目录中的文件名，并尝试 cat 输出内容
+        if [[ -d coscli_output ]]; then
+          for subdir in coscli_output/*/; do
+            if [[ -d "$subdir" ]]; then
+              echo "[INFO] Files in $subdir:"
+              find "$subdir" -type f | while read -r file; do
+                echo "--- $file ---"
+                cat "$file" || echo "[WARN] Could not cat $file"
+              done
+            fi
           done
         fi
