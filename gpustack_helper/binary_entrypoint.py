@@ -4,6 +4,7 @@ import multiprocessing
 import re
 import sys
 import os
+from gpustack_helper.tools import exe
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     binary_name = os.path.basename(
         sys.argv[0]
     )  # Ensure the script name is set correctly
-    if binary_name == "vox-box":
+    if binary_name == f"vox-box{exe()}":
         sys.exit(vox_box())
     else:
         sys.exit(gpustack())
