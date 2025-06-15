@@ -117,7 +117,8 @@ runs:
           # upload assets to tencentcos
           info "    Uploading assets..."
           if [[ "${DRY_RUN}" == "false" ]]; then
-            coscli sync "${SYNC_FILE_PATH}" cos://${TENCENT_COS_BUCKET}/${TENCENT_COS_PATH_PREFIX}${SYNC_DIR_NAME}/ --err-retry-num 3 --err-retry-interval 3 --recursive
+          info "      Syncing content in ${SYNC_FILE_PATH} to cos://${TENCENT_COS_BUCKET}/${TENCENT_COS_PATH_PREFIX}"
+            coscli sync "${SYNC_FILE_PATH}/" "cos://${TENCENT_COS_BUCKET}/${TENCENT_COS_PATH_PREFIX}" --err-retry-num 3 --err-retry-interval 3 --recursive
           fi
           info "  TencentCOS release ${SYNC_DIR_NAME} synced."
         elif [[ -n "${SPECIFIC_RELEASE_TAG}" ]]; then

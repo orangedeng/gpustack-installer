@@ -45,5 +45,6 @@ jobs:
           tencent-secret-key: "${{ secrets.CI_TECENTCOS_SECRET_KEY }}"
           tencent-cos-region: 'ap-guangzhou'
           tencent-cos-bucket: 'gpustack-installer-1303613262'
-          sync_file_path: dist
+          sync-file-path: dist
           tencent-cos-path-prefix: "dev/${{ steps.setup_version.outputs.GIT_VERSION }}/"
+          dry-run: false
