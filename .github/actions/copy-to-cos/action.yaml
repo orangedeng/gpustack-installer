@@ -20,7 +20,7 @@ inputs:
     description: 'Tencent COS path prefix where the release assets will be uploaded to.
       If not set, the default path will be "<github-repository>/releases/download/<tag_name>".'
     required: false
-    default: ''
+    default: '${{ github.repository }}/releases/download/'
   max-releases: 
     description: 'Maximum number of the latest releases to mirror.'
     required: false
@@ -56,7 +56,7 @@ runs:
         TENCENT_SECRET_KEY: "${{ inputs.tencent-secret-key }}"
         TENCENT_COS_REGION: "${{ inputs.tencent-cos-region }}"
         TENCENT_COS_BUCKET: "${{ inputs.tencent-cos-bucket }}"
-        TENCENT_COS_PATH_PREFIX: "${{ inputs.tencent-cos-path-prefix || ${github.repository}/releases/download/}}"
+        TENCENT_COS_PATH_PREFIX: "${{ inputs.tencent-cos-path-prefix }}"
         MAX_RELEASES: "${{ inputs.max-releases }}"
         SPECIFIC_RELEASE_TAG: "${{ inputs.specific-release-tag }}"
         SYNC_FILE_PATH: "${{ inputs.sync-file-path }}"
