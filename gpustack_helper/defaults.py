@@ -11,12 +11,14 @@ from platformdirs import (
 app_name = "GPUStack"
 gpustack_config_name = "config.yaml"
 
-base_path = abspath(
-    join(dirname(sys.executable), "../Resources")
+frozen_base = join(dirname(sys.executable), '../Resources') if sys.platform == "darwin" else join(dirname(sys.executable), '_internal')
+
+resource_path = abspath(
+    frozen_base
     if getattr(sys, "frozen", False)
     else join(dirname(abspath(__file__)), "..")
 )
-icon_path = join(base_path, "tray_icon.png")
+icon_path = join(resource_path, "tray_icon.png")
 
 data_dir = user_data_dir(app_name, appauthor=False, roaming=True)
 global_data_dir = site_data_dir(app_name, appauthor=False)
@@ -37,7 +39,7 @@ gpustack_binary_name = "gpustack" if sys.platform == "darwin" else "gpustack.exe
 gpustack_binary_path = join(dirname(sys.executable), gpustack_binary_name)
 
 nssm_binary_path = (
-    join(dirname(sys.executable), "nssm.exe")
+    join(resource_path, "nssm.exe")
     if os.getenv("NSS_BINARY_PATH", None) is None
     else os.getenv("NSS_BINARY_PATH")
 )

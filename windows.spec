@@ -26,7 +26,7 @@ tmp_ret = collect_all('aiosqlite')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
-a = Analysis(
+helper = Analysis(
     ['gpustack_helper\\main.py'],
     pathex=[],
     binaries=binaries,
@@ -39,11 +39,11 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
-pyz = PYZ(a.pure)
+helper_pyz = PYZ(helper.pure)
 
-exe = EXE(
-    pyz,
-    a.scripts,
+helper_exe = EXE(
+    helper_pyz,
+    helper.scripts,
     [],
     exclude_binaries=True,
     name=f'{app_name}helper'.lower(),
@@ -59,10 +59,70 @@ exe = EXE(
     entitlements_file=None,
     icon=['GPUStack.ico'],
 )
+
+
+
+gpustack = Analysis(
+    ['gpustack_helper\\binary_entrypoint.py'],
+    pathex=[],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+gpustack_pyz = PYZ(gpustack.pure)
+
+gpustack_exe = EXE(
+    gpustack_pyz,
+    gpustack.scripts,
+    [],
+    exclude_binaries=True,
+    name=f'{app_name}'.lower(),
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=True,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['GPUStack.ico'],
+)
+
+vox_box_exe = EXE(
+    gpustack_pyz,
+    gpustack.scripts,
+    [],
+    exclude_binaries=True,
+    name='vox-box',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=True,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=['GPUStack.ico'],
+)
+
 coll = COLLECT(
-    exe,
-    a.binaries,
-    a.datas,
+    helper_exe,
+    helper.binaries,
+    helper.datas,
+    gpustack_exe,
+    vox_box_exe,
+    gpustack.binaries,
+    gpustack.datas,
     strip=False,
     upx=True,
     upx_exclude=[],

@@ -331,11 +331,11 @@ class WindowsService(AbstractService):
                 text=True,
                 check=True,
             )
-            output = result.stdout.encode("latin1").decode("utf-16le").strip()
+            output = result.stdout.strip()
         except subprocess.CalledProcessError:
             # 服务不存在或命令失败，返回 Stop
             return AbstractService.State.Stop
-
+        logger.debug(f"nssm status output: {output}")
         # nssm 输出通常为: 'SERVICE_RUNNING', 'SERVICE_STOPPED', 等
         # 统一映射到 AbstractService.State
         if "RUNNING" in output:
