@@ -39,7 +39,7 @@ jobs:
           pattern: build-*
           merge-multiple: true
       - name: Copy to Tencent COS
-        uses: ./.github/actions/copy-to-cos.yaml
+        uses: ./.github/actions/copy-to-cos
         with:
           tencent-secret-id: "${{ secrets.CI_TECENTCOS_SECRET_ID }}"
           tencent-secret-key: "${{ secrets.CI_TECENTCOS_SECRET_KEY }}"
