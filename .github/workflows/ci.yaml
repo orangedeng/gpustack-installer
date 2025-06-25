@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - "v*-dev"
+      - "test-ci-build"
     paths-ignore:
       - "mkdocs.yml"
       - "docs/**"
