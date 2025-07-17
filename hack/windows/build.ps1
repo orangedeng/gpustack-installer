@@ -10,7 +10,7 @@ $ROOT_DIR = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-
 . "$ROOT_DIR/hack/lib/windows/init.ps1"
 
 function Build {
-    $distDir = Join-Path -Path $ROOT_DIR -ChildPath "dist"
+    $distDir = Join-Path -Path $ROOT_DIR -ChildPath "dist/gpustackhelper"
     Remove-Item -Path $distDir -Recurse -Force -ErrorAction SilentlyContinue
 
     $env:GIT_VERSION = $GIT_VERSION; poetry run pyinstaller helper.spec -y

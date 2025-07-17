@@ -116,7 +116,7 @@ function Get-GPUStackToolkitVersion{
         $GPUSTACK_BRANCH = $env:GPUSTACK_BRANCH
     }
     $GPUSTACK_VERSION = $env:GPUSTACK_VERSION
-    if ( $global:LAST_TAG -eq $null -and $GPUSTACK_VERSION -eq $null) {
+    if ($null -eq $global:LAST_TAG -and $null -eq $GPUSTACK_VERSION) {
         if ($global:GIT_VERSION -match '^v([0-9]+)\.([0-9]+)\.([0-9]+)$') {
             $major = $matches[1]
             $minor = $matches[2]
@@ -125,12 +125,12 @@ function Get-GPUStackToolkitVersion{
                 $patch_head = $patch.Substring(0, $patch.Length - 3)
                 $GPUSTACK_VERSION = "v$major.$minor.$patch_head"
             }
-        } 
+        }
     }
     $global:GPUSTACK_REPO = $GPUSTACK_REPO
     $global:GPUSTACK_BRANCH = $GPUSTACK_BRANCH
     $global:GPUSTACK_VERSION = $GPUSTACK_VERSION
-    
+
     $VOX_BOX_REPO="https://github.com/gpustack/vox-box.git"
     if ($env:VOX_BOX_REPO) {
         $VOX_BOX_REPO = $env:VOX_BOX_REPO
@@ -142,7 +142,7 @@ function Get-GPUStackToolkitVersion{
     }
     $global:VOX_BOX_VERSION = $VOX_BOX_VERSION
 
-    if ($GPUSTACK_VERSION -ne $null -and $GPUSTACK_VERSION -ne "") {
+    if ($null -ne $GPUSTACK_VERSION -and $GPUSTACK_VERSION -ne "") {
         $commit_line = git ls-remote $GPUSTACK_REPO $GPUSTACK_VERSION 2>$null | Select-Object -First 1
     } else{
         $commit_line = git ls-remote $GPUSTACK_REPO $GPUSTACK_BRANCH 2>$null | Select-Object -First 1

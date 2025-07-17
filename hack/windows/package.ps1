@@ -11,7 +11,7 @@ $ROOT_DIR = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-
 
 function Build-Installer {
     Set-Location $ROOT_DIR
-    $distDir = "dist/main"
+    $distDir = "dist/gpustackhelper"
     $buildDir = "build/_internal_files.wxs"
     # Use global GIT_VERSION and remove leading 'v' if present
     $productVersion = $global:GIT_VERSION -replace '^v', ''
