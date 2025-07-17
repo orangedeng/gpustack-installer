@@ -18,12 +18,9 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   } >> "$GITHUB_OUTPUT"
 fi
 
-if [ -n "$(command -v poetry)" ]; then
-  GPUSTACK_COMMIT="$(poetry export --without-hashes 2>/dev/null | grep 'gpustack' |grep -oE '@[0-9a-f]{7,40}' | head -n1 | cut -c2-8)"
-  echo "GPUSTACK_COMMIT=${GPUSTACK_COMMIT}"
-  # Use envsubst to replace variables in the template file
-  GIT_VERSION=${GIT_VERSION#v} GIT_COMMIT=${GIT_COMMIT:0:7} GPUSTACK_COMMIT=${GPUSTACK_COMMIT} envsubst < "${ROOT_DIR}/hack/patch/_version.py.tmpl" > "${ROOT_DIR}/gpustack_helper/_version.py"
-fi
+echo "GPUSTACK_COMMIT=${GPUSTACK_COMMIT} GPUSTACK_VERSION=${GPUSTACK_VERSION}"
+# Use envsubst to replace variables in the template file
+GIT_VERSION=${GIT_VERSION#v} GIT_COMMIT=${GIT_COMMIT:0:7} GPUSTACK_COMMIT=${GPUSTACK_COMMIT} GPUSTACK_VERSION=${GPUSTACK_VERSION} envsubst < "${ROOT_DIR}/hack/patch/_version.py.tmpl" > "${ROOT_DIR}/gpustack_helper/_version.py"
 
 # Print the variables
 echo "${GIT_VERSION}" "${GIT_COMMIT}" "${GIT_TREE_STATE}" "${BUILD_DATE} ${GPUSTACK_COMMIT}"

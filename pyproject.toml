@@ -12,16 +12,15 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-# gpustack = { version = "0.6.2", extras = ["audio"] }
-gpustack = { git = "https://github.com/gpustack/gpustack.git", branch = "main", extras = ["audio"] }
 
 PySide6-Essentials="~6.8"
 platformdirs = "^4.3.8"
 msgpack = "^1.1.1"
-pynini = { version = "2.1.6", markers = "sys_platform == 'darwin'" }
-wetextprocessing = { version = "1.0.4.1", markers = "sys_platform == 'darwin'" }
-transformers= "4.51.3"
-
+psutil = "^7.0.0"
+pydantic = "^2.11.5"
+pydantic-settings = "^2.2.1"
+pywin32 = { version="^308", markers = "platform_system == 'Windows'" }
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^6.13.0"

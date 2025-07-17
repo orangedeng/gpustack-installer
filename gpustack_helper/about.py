@@ -22,19 +22,17 @@ class About:
         self.helper_commit = "unknown"
 
         try:
-            from gpustack_helper import __version__ as __helper_version
-            from gpustack_helper import __commit__ as __helper_commit
-            from gpustack_helper import __gpustack_commit__
-            from gpustack import __version__ as gpustack_version
-            from gpustack import __git_commit__ as gpustack_commit
+            from gpustack_helper import (
+                __version__,
+                __commit__,
+                __gpustack_commit__,
+                __gpustack_version__,
+            )
 
-            self.helper_version = __helper_version
-            self.helper_commit = __helper_commit
-            self.gpustack_version = gpustack_version
-            self.gpustack_commit = gpustack_commit
-
-            if self.gpustack_commit == "HEAD" and __gpustack_commit__ != "":
-                self.gpustack_commit = __gpustack_commit__
+            self.helper_version = __version__
+            self.helper_commit = __commit__
+            self.gpustack_version = __gpustack_version__
+            self.gpustack_commit = __gpustack_commit__
 
         except Exception as e:
             logger.error("Failed to get GPUStack version or commit", exc_info=e)

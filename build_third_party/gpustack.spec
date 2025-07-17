@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import re
 import logging
@@ -9,7 +10,7 @@ from typing import Dict, Tuple, Optional
 from gpustack.worker.tools_manager import ToolsManager, BUILTIN_LLAMA_BOX_VERSION
 from gpustack.utils.platform import system, arch, DeviceTypeEnum
 from importlib.resources import files
-from gpustack_helper.defaults import get_dac_filename, dac_download_link
+from PyInstaller.utils.hooks import collect_all, collect_data_files
 
 LLAMA_BOX = 'llama-box'
 LLAMA_BOX_VERSION = os.getenv("LLAMA_BOX_VERSION", BUILTIN_LLAMA_BOX_VERSION)
@@ -20,8 +21,7 @@ TARGET_PREFIX = f"dl-{LLAMA_BOX}-{system()}-{arch()}-"
 TOOLKIT_NAME = os.getenv("TOOLKIT_NAME", None)
 ALL_TOOLKIT_NAME = "__all__"  # Special value to indicate all toolkits
 
-logger = logging.getLogger(__name__)
-
+logger = logging.getLogger('tools')
 
 def exe() -> str:
     return ".exe" if system() == "windows" else ""
@@ -201,30 +201,159 @@ def download():
         print(f"Error downloading tools: {e}")
         raise
 
+paths_to_insert = [
+    os.path.join(get_package_dir('vox_box'), 'third_party/CosyVoice'),
+    os.path.join(get_package_dir('vox_box'), 'third_party/dia'),
+    os.path.join(
+        get_package_dir('vox_box'), 'third_party/CosyVoice/third_party/Matcha-TTS'
+    ),
+]
 
-def download_dac(base_path: str) -> str:
-    filename = get_dac_filename()
-    download_link = dac_download_link()
-    if download_link is None:
-        raise ValueError(
-            f"Could not find model with filename {filename} in the DAC repository."
-        )
-    local_path = Path(base_path) / filename
-    if not local_path.exists():
-        response = requests.get(download_link)
-
-        if response.status_code != 200:
-            raise ValueError(
-                f"Could not download model. Received response code {response.status_code}"
-            )
-        local_path.write_bytes(response.content)
-    return str(local_path)
+for path in paths_to_insert:
+    sys.path.insert(0, path)
 
 
-if __name__ == "__main__":
-    try:
-        download()
-    except Exception as e:
-        print(f"Failed to download tools: {e}")
-        exit(1)
-    print("Tools downloaded successfully.")
+os.makedirs('./build/cache', exist_ok=True)
+
+datas = [
+    *collect_data_files('inflect', include_py_files=True),
+    *collect_data_files('typeguard', include_py_files=True),
+    *collect_data_files('tn', include_py_files=True),
+    *collect_data_files('itn', include_py_files=True),
+    *collect_data_files('audiotools'),
+    (os.path.join(get_package_dir('whisper'), 'assets'), './whisper/assets'),
+    (
+        os.path.join(get_package_dir('vox_box.backends.tts'), 'cosyvoice_spk2info.pt'),
+        './vox_box/backends/tts/',
+    ),
+    (get_package_dir('gpustack.migrations'), './gpustack/migrations'),
+    (get_package_dir('gpustack.ui'), './gpustack/ui'),
+    (get_package_dir('gpustack.assets'), './gpustack/assets'),
+    (
+        os.path.join(get_package_dir('gpustack'), 'third_party/bin/fastfetch'),
+        './gpustack/third_party/bin/fastfetch',
+    ),
+    (
+        os.path.join(get_package_dir('gpustack'), 'third_party/bin/gguf-parser'),
+        './gpustack/third_party/bin/gguf-parser',
+    ),
+    (
+        os.path.join(
+            get_package_dir('gpustack'),
+            f'third_party/bin/llama-box/llama-box-{BUILTIN_LLAMA_BOX_VERSION}-*',
+        ),
+        './gpustack/third_party/bin/llama-box',
+    ),
+    (
+        os.path.join(
+            get_package_dir('gpustack'),
+            'third_party/bin/versions.json',
+        ),
+        './gpustack/third_party/bin',
+    ),
+    (
+        os.path.join(get_package_dir('gpustack.detectors.fastfetch'), '*.jsonc'),
+        './gpustack/detectors/fastfetch/',
+    ),
+]
+
+download()
+binaries = []
+hiddenimports = []
+
+for pkg in [
+    'aiosqlite',
+    'asyncmy',
+    'asyncpg',
+    'cosyvoice',
+    'matcha',
+    'dia',
+    'dac',
+    'transformers',
+]:
+    pkg_datas = collect_all(pkg)
+    datas += pkg_datas[0]
+    binaries += pkg_datas[1]
+    hiddenimports += pkg_datas[2]
+
+
+is_windows = sys.platform == 'win32'
+
+if not is_windows:
+    if os.getenv('INSTALL_PREFIX', None) is None:
+        binaries += [
+            (f'{os.getcwd()}/openfst/build/lib/*', './'),
+        ]
+
+    hiddenimports += [
+        'tn', 'itn', '_pywrapfst'
+    ]
+    pkg_datas = collect_all('pynini')
+    datas += pkg_datas[0]
+    binaries += pkg_datas[1]
+    hiddenimports += pkg_datas[2]
+
+gpustack = Analysis(
+    ['entrypoint.py'],
+    pathex=[],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=0,
+)
+gpustack_pyz = PYZ(gpustack.pure)
+gpustack_exe = EXE(
+    gpustack_pyz,
+    gpustack.scripts,
+    [],
+    exclude_binaries=True,
+    name='gpustack',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=is_windows,
+    disable_windowed_traceback=False,
+    argv_emulation=not is_windows,
+    target_arch=None,
+    codesign_identity= os.getenv('CODESIGN_IDENTITY', None) if not is_windows else None,
+    entitlements_file=None,
+    icon=[os.path.abspath(os.path.join(os.getcwd(),'GPUStack.ico'))] if is_windows else None,
+    contents_directory='third_party_internal',
+)
+
+vox_box_exe = EXE(
+    gpustack_pyz,
+    gpustack.scripts,
+    [],
+    exclude_binaries=True,
+    name='vox-box',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=is_windows,
+    disable_windowed_traceback=False,
+    argv_emulation=not is_windows,
+    target_arch=None,
+    codesign_identity= os.getenv('CODESIGN_IDENTITY', None) if not is_windows else None,
+    entitlements_file=None,
+    icon=[os.path.abspath(os.path.join(os.getcwd(),'GPUStack.ico'))] if is_windows else None,
+    contents_directory='third_party_internal',
+)
+
+coll = COLLECT(
+    gpustack_exe,
+    vox_box_exe,
+    gpustack.binaries,
+    gpustack.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='third_party',
+)

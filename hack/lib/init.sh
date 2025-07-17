@@ -21,3 +21,4 @@ done
 
 gpustack::log::install_errexit
 gpustack::version::get_version_vars
+gpustack::version::get_toolkit_version

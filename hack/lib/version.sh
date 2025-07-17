@@ -107,3 +107,32 @@ function gpustack::version::get_version_vars() {
     fi
   fi
 }
+
+function gpustack::version::get_toolkit_version() {
+  GPUSTACK_REPO="${GPUSTACK_REPO:-https://github.com/gpustack/gpustack.git}"
+  local GPUSTACK_BRANCH="${GPUSTACK_BRANCH:-main}"
+  GPUSTACK_VERSION="${GPUSTACK_VERSION:-}"
+  # last tag is null means that is tagging
+  if [ -z "${LAST_TAG:-}" ] && [[ ! "${GIT_VERSION}" =~ ^v0\\.0\\. ]] && [[ -z "${GPUSTACK_VERSION}" ]]; then
+    if [[ "$GIT_VERSION" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+      local major="${BASH_REMATCH[1]}"
+      local minor="${BASH_REMATCH[2]}"
+      local patch="${BASH_REMATCH[3]}"
+      if (( ${#patch} >= 4 )); then
+        patch_head="${patch:0:${#patch}-3}"
+        GPUSTACK_VERSION="v${major}.${minor}.${patch_head}"
+      fi
+    fi
+  fi
+
+  # needs to bump VOX_BOX versions here
+  VOX_BOX_REPO="${VOX_BOX_REPO:-https://github.com/gpustack/vox-box.git}"
+  VOX_BOX_VERSION="${VOX_BOX_VERSION:-v0.0.18}"
+
+  if [[ -n "${GPUSTACK_VERSION}" ]]; then
+    GPUSTACK_COMMIT=$(git ls-remote "${GPUSTACK_REPO}" "${GPUSTACK_VERSION}" | awk '{print $1}' | cut -c1-7)
+  else
+    #shellcheck disable=SC2034
+    GPUSTACK_COMMIT=$(git ls-remote "${GPUSTACK_REPO}" "${GPUSTACK_BRANCH}" | awk '{print $1}' | cut -c1-7)
+  fi
+}

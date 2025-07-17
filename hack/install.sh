@@ -11,8 +11,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 # Include the common functions
 source "${ROOT_DIR}/hack/lib/init.sh"
 
-PREFIX="${INSTALL_PREFIX:-${ROOT_DIR}/openfst/build}"
-
 function download_deps() {
   if [[ -z "$(command -v poetry)" ]]; then
     pip install poetry==1.8.3
@@ -28,9 +26,6 @@ function download_deps() {
 }
 
 gpustack::log::info "+++ DEPENDENCIES +++"
-source "${ROOT_DIR}/hack/build-openfst.sh"
-export LIBRARY_PATH="${PREFIX}/lib:${LIBRARY_PATH:-}"
-export CPLUS_INCLUDE_PATH="${PREFIX}/include:${CPLUS_INCLUDE_PATH:-}"
 download_deps
 source "${ROOT_DIR}/hack/export_version.sh"
 gpustack::log::info "--- DEPENDENCIES ---"

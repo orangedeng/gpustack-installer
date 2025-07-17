@@ -170,6 +170,7 @@ jobs:
         run: |
           make install
           make lint
+          make build-gpustack
           make build
 
       - name: Package

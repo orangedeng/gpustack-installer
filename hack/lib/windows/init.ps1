@@ -15,3 +15,4 @@ Get-ChildItem -Path "$ROOT_DIR/hack/lib/windows" -File | ForEach-Object {
 
 GPUStack.Log.Errexit
 Get-GPUStackVersionVar
+Get-GPUStackToolkitVersion

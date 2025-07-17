@@ -21,7 +21,7 @@ runtime_plist_path = (
 frozen_base = (
     join(dirname(sys.executable), '../Resources')
     if sys.platform == "darwin"
-    else join(dirname(sys.executable), '_internal')
+    else join(dirname(sys.executable), 'gpustackhelper_internal')
 )
 
 resource_path = abspath(
@@ -40,9 +40,9 @@ log_file_path = (
     if sys.platform == "darwin"
     else join(global_data_dir, "log", "gpustack.log")
 )
-
+third_party_base = join(resource_path, "third_party")
 gpustack_binary_name = "gpustack" if sys.platform == "darwin" else "gpustack.exe"
-gpustack_binary_path = join(dirname(sys.executable), gpustack_binary_name)
+gpustack_binary_path = join(third_party_base, gpustack_binary_name)
 
 nssm_binary_path = (
     join(resource_path, "nssm.exe")

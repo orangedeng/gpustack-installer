@@ -10,6 +10,7 @@ source "${ROOT_DIR}/hack/lib/init.sh"
 function ci() {
   make install "$@"
   make lint "$@"
+  make build-gpustack "$@"
   make build "$@"
   make package "$@"
 }

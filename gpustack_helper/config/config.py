@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, PrivateAttr
 from typing import List, Dict, Optional, Callable, TypeVar, Tuple
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QGuiApplication
-from gpustack.config import Config
+from gpustack_helper.config.gpustack_config import Config
 from gpustack_helper.defaults import (
     log_file_path,
     data_dir as default_data_dir,
@@ -141,7 +141,6 @@ class GPUStackConfig(Config):
     _confg_path: str = PrivateAttr(default=None)
     _data_dir: str = PrivateAttr(default=None)
     # override the data_dir configured in Config
-    data_dir: Optional[str] = Field(default=None, exclude=True, description="数据目录")
 
     @property
     def static_data_dir(self) -> str:
