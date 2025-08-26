@@ -7,19 +7,19 @@ set -o pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${ROOT_DIR}/hack/lib/init.sh"
 
-function force_sign_app(){
-  pushd dist
-  gpustack::log::info "Force signing GPUStack.app"
-  APP_NAME="GPUStack.app"
-  CODESIGN_IDENTITY="${CODESIGN_IDENTITY:-Developer ID Application: Seal Software Co., Ltd. (33M7PPLX4U)}"
-  if ! security find-identity -v | grep -q "$CODESIGN_IDENTITY"; then
-    gpustack::log::warn "Certificate '$CODESIGN_IDENTITY' not found. Skipping signing."
-    popd
-    return 0
-  fi
-  codesign --deep --force --verify --verbose --sign "$CODESIGN_IDENTITY" --options runtime --timestamp "$APP_NAME"
-  popd
-}
+# function force_sign_app(){
+#   pushd dist
+#   gpustack::log::info "Force signing GPUStack.app"
+#   APP_NAME="GPUStack.app"
+#   CODESIGN_IDENTITY="${CODESIGN_IDENTITY:-Developer ID Application: Seal Software Co., Ltd. (33M7PPLX4U)}"
+#   if ! security find-identity -v | grep -q "$CODESIGN_IDENTITY"; then
+#     gpustack::log::warn "Certificate '$CODESIGN_IDENTITY' not found. Skipping signing."
+#     popd
+#     return 0
+#   fi
+#   codesign --deep --force --verify --verbose --sign "$CODESIGN_IDENTITY" --options runtime --timestamp "$APP_NAME"
+#   popd
+# }
 
 function package() {
   pushd dist
@@ -84,7 +84,7 @@ function sign_installer() {
 }
 
 gpustack::log::info "+++ PACKAGE +++"
-force_sign_app
+# force_sign_app
 package
 sign_installer
 gpustack::log::info "--- PACKAGE ---"

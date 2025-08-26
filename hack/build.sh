@@ -71,7 +71,7 @@ function build() {
     
     # 如果设置了代码签名身份，重新签名应用
     if [ -n "${CODESIGN_IDENTITY:-}" ]; then
-        codesign --force --deep --sign "${CODESIGN_IDENTITY}" "${ROOT_DIR}/dist/GPUStack.app"
+        codesign --deep --force --verify --verbose --sign "$CODESIGN_IDENTITY" --options runtime --timestamp "${ROOT_DIR}/dist/GPUStack.app"
     fi
   fi
 }

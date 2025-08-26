@@ -310,7 +310,7 @@ def build_helper():
         argv_emulation=not is_windows,
         target_arch=None,
         codesign_identity=os.getenv('CODESIGN_IDENTITY', None) if not is_windows else None,
-        entitlements_file=None,
+        entitlements_file='./entitlements.plist' if not is_windows else None,
         icon=['GPUStack.ico'],
     )
     return helper, helper_exe
@@ -421,7 +421,7 @@ def build_gpustack():
         argv_emulation=not is_windows,
         target_arch=None,
         codesign_identity=os.getenv('CODESIGN_IDENTITY', None) if not is_windows else None,
-        entitlements_file=None,
+        entitlements_file='./entitlements.plist' if not is_windows else None,
         icon=[os.path.abspath(os.path.join(os.getcwd(),'GPUStack.ico'))] if is_windows else None,
     )
 
@@ -440,7 +440,7 @@ def build_gpustack():
         argv_emulation=not is_windows,
         target_arch=None,
         codesign_identity=os.getenv('CODESIGN_IDENTITY', None) if not is_windows else None,
-        entitlements_file=None,
+        entitlements_file='./entitlements.plist' if not is_windows else None,
         icon=[os.path.abspath(os.path.join(os.getcwd(),'GPUStack.ico'))] if is_windows else None,
     )
 
